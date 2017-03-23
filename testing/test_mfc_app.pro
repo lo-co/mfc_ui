@@ -19,8 +19,10 @@ LIBS += -lpthread
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    ../serial/serial.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    ../serial/serial.h
 
 FORMS    += mainwindow.ui
