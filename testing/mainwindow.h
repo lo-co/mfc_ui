@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include "../serial/serial.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +21,12 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    boost::asio::io_service io_service_;
+
+    Serial serial_port;
+    //boost::thread t;
+    char* data;
 
 private slots:
     void on_mfc0SP_valueChanged(double arg1);

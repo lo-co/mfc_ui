@@ -1,11 +1,13 @@
 #include "serial.h"
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 
 Serial::Serial(boost::asio::io_service& io_service, unsigned int baud, const string& device)
     : active_(true),
       io_service_(io_service),
-      serialPort(io_service, device)
+      serialPort(io_service, device),
+      read_msg_(new char[max_read_length])
 {
     if (not serialPort.is_open())
     {
@@ -20,12 +22,12 @@ Serial::Serial(boost::asio::io_service& io_service, unsigned int baud, const str
 
 void Serial::write(const char msg) // pass the write data to the do_write function via the io service in the other thread
 {
-    io_service_.post(boost::bind(&minicom_client::do_write, this, msg));
+    io_service_.post(boost::bind(&Serial::do_write, this, msg));
 }
 
 void Serial::close() // call the do_close function via the io service in the other thread
 {
-    io_service_.post(boost::bind(&minicom_client::do_close, this, boost::system::error_code()));
+    io_service_.post(boost::bind(&Serial::do_close, this, boost::system::error_code()));
 }
 
 bool Serial::active() // return true if the socket is still active
@@ -33,14 +35,10 @@ bool Serial::active() // return true if the socket is still active
     return active_;
 }
 
-//private:
-
-
-
 void Serial::read_start()
 { // Start an asynchronous read and call read_complete when it completes or fails
     serialPort.async_read_some(boost::asio::buffer(read_msg_, max_read_length),
-                               boost::bind(&minicom_client::read_complete,
+                               boost::bind(&Serial::read_complete,
                                            this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
@@ -50,7 +48,17 @@ void Serial::read_complete(const boost::system::error_code& error, size_t bytes_
 { // the asynchronous read operation has now completed or failed and returned an error
     if (!error)
     { // read completed, so process the data
-        cout.write(read_msg_, bytes_transferred); // echo to standard output
+        //cout << "here i am" << endl;
+
+        string str_msg = string(read_msg_);
+        cout <<'\r' << str_msg << flush;
+        boost::char_separator<char> sep(" ");
+        boost::tokenizer<boost::char_separator<char>> tok(str_msg, sep);
+
+        /*for(boost::tokenizer<boost::char_separator<char>>::iterator beg=tok.begin(); beg!=tok.end();++beg){
+            cout << *beg << "\n";
+        }*/
+        //cout.write(read_msg_, bytes_transferred); // echo to standard output
         read_start(); // start waiting for another asynchronous read again
     }
     else
@@ -69,7 +77,7 @@ void Serial::write_start()
 { // Start an asynchronous write and call write_complete when it completes or fails
     boost::asio::async_write(serialPort,
                              boost::asio::buffer(&write_msgs_.front(), 1),
-                             boost::bind(&minicom_client::write_complete,
+                             boost::bind(&Serial::write_complete,
                                          this,
                                          boost::asio::placeholders::error));
 }
