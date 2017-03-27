@@ -10,56 +10,16 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/preprocessor.hpp>
+#include <functional>
 
-/* All of the above macros are used to convert strings returned from the
- * Alicat to an enum type defined in the macro invocation immediately
- * following.  This was taken from
- *
- * https://stackoverflow.com/questions/5093460/how-to-convert-an-enum-type-variable-to-a-string#5094430
- *
- * It will be moved to wherever we need it.
- */
-#define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)    \
-    case elem : return BOOST_PP_STRINGIZE(elem);
+typedef std::function<void(std::string)> handler;
 
-#define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)                \
-    enum name {                                                               \
-        BOOST_PP_SEQ_ENUM(enumerators)                                        \
-    };                                                                        \
-                                                                              \
-    inline const char* ToString(name v)                                       \
-    {                                                                         \
-        switch (v)                                                            \
-        {                                                                     \
-            BOOST_PP_SEQ_FOR_EACH(                                            \
-                X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE,          \
-                name,                                                         \
-                enumerators                                                   \
-            )                                                                 \
-            default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
-        }                                                                     \
-    }
-
-/* Here is the enumeration for gas based on the preprocessor definition above */
-DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air))
-
-/* This stuff is only here for testing right now...
- * move it when we have determined this will work.
- */
-struct alicat_data{
-    std::string address;
-    float pressure;
-    float temperature;
-    float flow_rate;
-    float mass_flow_rate;
-    gas gas_;
-
-};
+/* TODO - use a callback function that fires when a buffer is updated with data... */
 
 class Serial
 {
 public:
-    Serial(boost::asio::io_service& io_service, unsigned int baud, const std::string& device);
+    Serial(boost::asio::io_service& io_service, unsigned int baud, const std::string& device, handler handler_);
     void write(const char msg);
     void close();
     bool active();
@@ -78,6 +38,8 @@ private:
     void write_start();
     void write_complete(const boost::system::error_code& error);
     void do_close(const boost::system::error_code& error);
+
+    handler data_handler;
 };
 
 #endif // SERIAL_H

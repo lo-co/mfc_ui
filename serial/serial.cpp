@@ -3,11 +3,13 @@
 
 using namespace std;
 
-Serial::Serial(boost::asio::io_service& io_service, unsigned int baud, const string& device)
+
+Serial::Serial(boost::asio::io_service& io_service, unsigned int baud, const string& device, handler handler_)
     : active_(true),
       io_service_(io_service),
       serialPort(io_service, device),
-      read_msg_(new char[max_read_length])
+      read_msg_(new char[max_read_length]),
+      data_handler(handler_)
 {
     if (not serialPort.is_open())
     {
@@ -37,6 +39,7 @@ bool Serial::active() // return true if the socket is still active
 
 void Serial::read_start()
 { // Start an asynchronous read and call read_complete when it completes or fails
+
     serialPort.async_read_some(boost::asio::buffer(read_msg_, max_read_length),
                                boost::bind(&Serial::read_complete,
                                            this,
@@ -48,12 +51,15 @@ void Serial::read_complete(const boost::system::error_code& error, size_t bytes_
 { // the asynchronous read operation has now completed or failed and returned an error
     if (!error)
     { // read completed, so process the data
-        //cout << "here i am" << endl;
 
+        data_handler(string(read_msg_));
         string str_msg = string(read_msg_);
-        cout <<'\r' << str_msg << flush;
-        boost::char_separator<char> sep(" ");
-        boost::tokenizer<boost::char_separator<char>> tok(str_msg, sep);
+
+
+        //string str_msg = string(msg);
+        //cout <<'\r' << str_msg << flush;
+        //boost::char_separator<char> sep(" ");
+        //boost::tokenizer<boost::char_separator<char>> tok(str_msg, sep);
 
         /*for(boost::tokenizer<boost::char_separator<char>>::iterator beg=tok.begin(); beg!=tok.end();++beg){
             cout << *beg << "\n";
