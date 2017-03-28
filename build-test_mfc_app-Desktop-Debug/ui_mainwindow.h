@@ -13,6 +13,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QCheckBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
@@ -22,9 +23,9 @@
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QStatusBar>
-#include <QtGui/QTextEdit>
 #include <QtGui/QTimeEdit>
 #include <QtGui/QToolBar>
+#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -37,18 +38,21 @@ public:
     QLabel *label;
     QPlainTextEdit *log_text_box;
     QTimeEdit *timeEdit;
-    QDoubleSpinBox *Q;
-    QDoubleSpinBox *Q0;
-    QDoubleSpinBox *P;
-    QDoubleSpinBox *T;
-    QDoubleSpinBox *Qsp;
     QLabel *label_2;
-    QPushButton *sendTextBtn;
-    QTextEdit *addressTxtBox;
+    QWidget *layoutWidget;
+    QVBoxLayout *verticalLayout;
     QLabel *label_3;
-    QTextEdit *dataTxtBox;
+    QDoubleSpinBox *ac0_P;
     QLabel *label_4;
-    QTextEdit *dataInTxtBox;
+    QDoubleSpinBox *ac0_T;
+    QLabel *label_5;
+    QDoubleSpinBox *ac0_Q;
+    QLabel *label_6;
+    QDoubleSpinBox *ac0_Q0;
+    QLabel *label_7;
+    QDoubleSpinBox *ac0_Qsp;
+    QCheckBox *checkBox;
+    QPushButton *saveButton;
     QMenuBar *menuBar;
     QMenu *menuAlicat_Control;
     QToolBar *mainToolBar;
@@ -74,71 +78,101 @@ public:
         label->setFont(font);
         log_text_box = new QPlainTextEdit(centralWidget);
         log_text_box->setObjectName(QString::fromUtf8("log_text_box"));
-        log_text_box->setGeometry(QRect(20, 340, 651, 91));
+        log_text_box->setGeometry(QRect(20, 400, 651, 91));
         log_text_box->setAcceptDrops(false);
         log_text_box->setReadOnly(true);
         timeEdit = new QTimeEdit(centralWidget);
         timeEdit->setObjectName(QString::fromUtf8("timeEdit"));
-        timeEdit->setGeometry(QRect(410, 100, 118, 26));
+        timeEdit->setGeometry(QRect(380, 30, 118, 26));
         timeEdit->setFrame(true);
         timeEdit->setReadOnly(true);
         timeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
         timeEdit->setTimeSpec(Qt::UTC);
         timeEdit->setTime(QTime(2, 0, 0));
-        Q = new QDoubleSpinBox(centralWidget);
-        Q->setObjectName(QString::fromUtf8("Q"));
-        Q->setGeometry(QRect(410, 130, 69, 26));
-        Q->setReadOnly(true);
-        Q->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        Q0 = new QDoubleSpinBox(centralWidget);
-        Q0->setObjectName(QString::fromUtf8("Q0"));
-        Q0->setGeometry(QRect(410, 160, 69, 26));
-        Q0->setReadOnly(true);
-        Q0->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        P = new QDoubleSpinBox(centralWidget);
-        P->setObjectName(QString::fromUtf8("P"));
-        P->setGeometry(QRect(410, 190, 69, 26));
-        P->setReadOnly(true);
-        P->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        T = new QDoubleSpinBox(centralWidget);
-        T->setObjectName(QString::fromUtf8("T"));
-        T->setGeometry(QRect(410, 220, 69, 26));
-        T->setReadOnly(true);
-        T->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        Qsp = new QDoubleSpinBox(centralWidget);
-        Qsp->setObjectName(QString::fromUtf8("Qsp"));
-        Qsp->setGeometry(QRect(410, 250, 69, 26));
-        Qsp->setReadOnly(true);
-        Qsp->setButtonSymbols(QAbstractSpinBox::NoButtons);
         label_2 = new QLabel(centralWidget);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(20, 320, 67, 17));
-        sendTextBtn = new QPushButton(centralWidget);
-        sendTextBtn->setObjectName(QString::fromUtf8("sendTextBtn"));
-        sendTextBtn->setGeometry(QRect(150, 200, 131, 28));
-#ifndef QT_NO_TOOLTIP
-        sendTextBtn->setToolTip(QString::fromUtf8("Hit to send text in box..."));
-#endif // QT_NO_TOOLTIP
-        addressTxtBox = new QTextEdit(centralWidget);
-        addressTxtBox->setObjectName(QString::fromUtf8("addressTxtBox"));
-        addressTxtBox->setGeometry(QRect(33, 147, 71, 31));
-        label_3 = new QLabel(centralWidget);
+        label_2->setGeometry(QRect(20, 380, 67, 17));
+        layoutWidget = new QWidget(centralWidget);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(400, 100, 139, 281));
+        verticalLayout = new QVBoxLayout(layoutWidget);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        label_3 = new QLabel(layoutWidget);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(30, 120, 111, 18));
-        dataTxtBox = new QTextEdit(centralWidget);
-        dataTxtBox->setObjectName(QString::fromUtf8("dataTxtBox"));
-        dataTxtBox->setGeometry(QRect(30, 210, 104, 78));
-        label_4 = new QLabel(centralWidget);
+
+        verticalLayout->addWidget(label_3);
+
+        ac0_P = new QDoubleSpinBox(layoutWidget);
+        ac0_P->setObjectName(QString::fromUtf8("ac0_P"));
+        ac0_P->setReadOnly(true);
+        ac0_P->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        verticalLayout->addWidget(ac0_P);
+
+        label_4 = new QLabel(layoutWidget);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(30, 180, 59, 18));
-        dataInTxtBox = new QTextEdit(centralWidget);
-        dataInTxtBox->setObjectName(QString::fromUtf8("dataInTxtBox"));
-        dataInTxtBox->setGeometry(QRect(20, 470, 651, 78));
-        dataInTxtBox->setReadOnly(true);
+
+        verticalLayout->addWidget(label_4);
+
+        ac0_T = new QDoubleSpinBox(layoutWidget);
+        ac0_T->setObjectName(QString::fromUtf8("ac0_T"));
+        ac0_T->setReadOnly(true);
+        ac0_T->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        verticalLayout->addWidget(ac0_T);
+
+        label_5 = new QLabel(layoutWidget);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        verticalLayout->addWidget(label_5);
+
+        ac0_Q = new QDoubleSpinBox(layoutWidget);
+        ac0_Q->setObjectName(QString::fromUtf8("ac0_Q"));
+        ac0_Q->setReadOnly(true);
+        ac0_Q->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        verticalLayout->addWidget(ac0_Q);
+
+        label_6 = new QLabel(layoutWidget);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        verticalLayout->addWidget(label_6);
+
+        ac0_Q0 = new QDoubleSpinBox(layoutWidget);
+        ac0_Q0->setObjectName(QString::fromUtf8("ac0_Q0"));
+        ac0_Q0->setReadOnly(true);
+        ac0_Q0->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        verticalLayout->addWidget(ac0_Q0);
+
+        label_7 = new QLabel(layoutWidget);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+
+        verticalLayout->addWidget(label_7);
+
+        ac0_Qsp = new QDoubleSpinBox(layoutWidget);
+        ac0_Qsp->setObjectName(QString::fromUtf8("ac0_Qsp"));
+        ac0_Qsp->setReadOnly(true);
+        ac0_Qsp->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+        verticalLayout->addWidget(ac0_Qsp);
+
+        checkBox = new QCheckBox(centralWidget);
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
+        checkBox->setGeometry(QRect(200, 140, 85, 24));
+        checkBox->setCheckable(true);
+        saveButton = new QPushButton(centralWidget);
+        saveButton->setObjectName(QString::fromUtf8("saveButton"));
+        saveButton->setGeometry(QRect(210, 60, 80, 26));
+        saveButton->setCheckable(true);
+        saveButton->setChecked(false);
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 703, 28));
+        menuBar->setGeometry(QRect(0, 0, 703, 23));
         menuAlicat_Control = new QMenu(menuBar);
         menuAlicat_Control->setObjectName(QString::fromUtf8("menuAlicat_Control"));
         MainWindow->setMenuBar(menuBar);
@@ -165,9 +199,13 @@ public:
 #endif // QT_NO_TOOLTIP
         timeEdit->setDisplayFormat(QApplication::translate("MainWindow", "hh:mm:ss", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("MainWindow", "Log", 0, QApplication::UnicodeUTF8));
-        sendTextBtn->setText(QApplication::translate("MainWindow", "Send", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("MainWindow", "Device Address", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("MainWindow", "Data", 0, QApplication::UnicodeUTF8));
+        label_3->setText(QApplication::translate("MainWindow", "Pressure (mb)", 0, QApplication::UnicodeUTF8));
+        label_4->setText(QApplication::translate("MainWindow", "Temperature (degC)", 0, QApplication::UnicodeUTF8));
+        label_5->setText(QApplication::translate("MainWindow", "Q (lpm)", 0, QApplication::UnicodeUTF8));
+        label_6->setText(QApplication::translate("MainWindow", "Q0 (slpm)", 0, QApplication::UnicodeUTF8));
+        label_7->setText(QApplication::translate("MainWindow", "Qsp (lpm)", 0, QApplication::UnicodeUTF8));
+        checkBox->setText(QApplication::translate("MainWindow", "CheckBox", 0, QApplication::UnicodeUTF8));
+        saveButton->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
         menuAlicat_Control->setTitle(QApplication::translate("MainWindow", "Alicat Control", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

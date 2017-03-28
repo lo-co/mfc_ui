@@ -6,7 +6,11 @@
 #include <functional>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
-#include "../test_mfc_app/alicat/alicat.h"
+#include "../alicat/alicat.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <iostream>
+#include <locale>
+
 
 using namespace std;
 
@@ -16,6 +20,7 @@ void MainWindow::simple_test(string msg){
     std::vector<string> tokens;
     boost::split(tokens, msg, boost::is_any_of(" "));
 
+    // Example of how to update controls for one of the controllers
     if (tokens.at(0) == "A"){
         ui->ac0_P->setValue(std::stof(tokens.at(1)));
         ui->ac0_T->setValue(std::stof(tokens.at(2)));
@@ -42,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     io_service_(),
-    serial_port(io_service_, 19200, "/dev/ttyUSB3", std::bind(&MainWindow::simple_test, this, std::placeholders::_1))
+    serial_port(io_service_, 19200, "/dev/ttyUSB3", std::bind(&MainWindow::simple_test, this, std::placeholders::_1)),
+    data_path("data")
 {
     //callback = &MainWindow::simple_test;
     ui->setupUi(this);
@@ -56,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Clear the line...
     serial_port.write('\r');
     serial_port.write('\r');
+
+    /* If the main data path does not exist, create it... */
+    if (!boost::filesystem::exists(data_path)) boost::filesystem::create_directory(data_path);
 
     getData();
 }
@@ -106,5 +115,24 @@ void MainWindow::getData(){
 
     // Alternate the controller we are talking to.
     alt = !alt;
+
+}
+
+void MainWindow::on_saveButton_clicked(bool checked)
+{
+    if (checked){
+        boost::posix_time::time_facet *facet = new boost::posix_time::time_facet("%Y%d%b_%H%M%S");
+
+        // stream to stick the string based format...
+        std::stringstream  ss;
+        // Get the current time
+        const boost::posix_time::ptime time = boost::posix_time::ptime();
+
+        ss.imbue(std::locale(std::locale::classic(), facet));
+        ss << time;
+
+        // String representation of time...
+        ss.str();
+    }
 
 }

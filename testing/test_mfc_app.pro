@@ -17,6 +17,7 @@ TEMPLATE = app
 LIBS += -L/usr/include/boost -lboost_system
 LIBS += -lpthread
 LIBS += -lboost_thread
+LIBS += -lboost_filesystem
 
 
 SOURCES += main.cpp\
