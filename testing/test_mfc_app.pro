@@ -21,9 +21,11 @@ LIBS += -lboost_thread
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ../serial/serial.cpp
+    ../serial/serial.cpp \
+    ../alicat/alicat.cpp
 
 HEADERS  += mainwindow.h \
-    ../serial/serial.h
+    ../serial/serial.h \
+    ../alicat/alicat.h
 
 FORMS    += mainwindow.ui

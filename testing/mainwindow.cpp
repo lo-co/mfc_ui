@@ -4,66 +4,33 @@
 #include <qt4/QtCore/QTimer>
 #include <qt4/QtCore/QString>
 #include <functional>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
+#include "../test_mfc_app/alicat/alicat.h"
 
 using namespace std;
-
-/* All of the above macros are used to convert strings returned from the
- * Alicat to an enum type defined in the macro invocation immediately
- * following.  This was taken from
- *
- * https://stackoverflow.com/questions/5093460/how-to-convert-an-enum-type-variable-to-a-string#5094430
- *
- * It will be moved to wherever we need it.
- */
-#define X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE(r, data, elem)    \
-    case elem : return BOOST_PP_STRINGIZE(elem);
-
-#define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)                \
-    enum name {                                                               \
-        BOOST_PP_SEQ_ENUM(enumerators)                                        \
-    };                                                                        \
-                                                                              \
-    inline const char* ToString(name v)                                       \
-    {                                                                         \
-        switch (v)                                                            \
-        {                                                                     \
-            BOOST_PP_SEQ_FOR_EACH(                                            \
-                X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE,          \
-                name,                                                         \
-                enumerators                                                   \
-            )                                                                 \
-            default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
-        }                                                                     \
-    }
-
-/* Here is the enumeration for gas based on the preprocessor definition above */
-DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air))
-
-/* This stuff is only here for testing right now...
- * move it when we have determined this will work.
- */
-struct alicat_data{
-    std::string address;
-    float pressure;
-    float temperature;
-    float flow_rate;
-    float mass_flow_rate;
-    gas gas_;
-
-};
-
-
-void stupid_test(string msg){
-    cout <<'\r' << msg << flush;
-
-    //QString qs;
-
-    //ui->log_text_box->setPlainText(qs.fromStdString(msg));
-}
 
 void MainWindow::simple_test(string msg){
     cout <<'\r' << msg << flush;
 
+    std::vector<string> tokens;
+    boost::split(tokens, msg, boost::is_any_of(" "));
+
+    if (tokens.at(0) == "A"){
+        ui->ac0_P->setValue(std::stof(tokens.at(1)));
+        ui->ac0_T->setValue(std::stof(tokens.at(2)));
+        ui->ac0_Q->setValue(std::stof(tokens.at(3)));
+        ui->ac0_Q0->setValue(std::stof(tokens.at(4)));
+    }
+
+
+
+    /*boost::char_separator<char> sep(" ");
+    boost::tokenizer<boost::char_separator<char>> tok(msg, sep);
+
+    for(boost::tokenizer<boost::char_separator<char>>::iterator beg=tok.begin(); beg!=tok.end();++beg){
+        cout << *beg << "\n";
+    }*/
     QString qs;
 
     ui->log_text_box->setPlainText(qs.fromStdString(msg));
@@ -84,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(getData()));
 
     // This is polling pretty fast...
-    timer->start(50);
+    timer->start(250);
 
     // Clear the line...
     serial_port.write('\r');
@@ -108,6 +75,16 @@ void MainWindow::on_mfc0SP_valueChanged(double arg1)
     std::cout << "Current value of control is: " +
                  std::to_string(ui->mfc0SP->value()) << std::endl;
 
+    /* char* flow_int = std::to_string(int(ui->mfc0SP->value()*64000/100));
+
+    serial_port.write('A');
+
+
+
+    serial_port.write(flow_int);
+    serial_port.write('\r');
+
+    */
     // A delay should be added to make sure that there is no
     // collision...
 
