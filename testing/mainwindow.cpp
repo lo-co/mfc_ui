@@ -21,7 +21,7 @@ void MainWindow::simple_test(string msg){
     boost::split(tokens, msg, boost::is_any_of(" "));
 
     // Example of how to update controls for one of the controllers
-    if (tokens.at(0) == "A"){
+    if (tokens.at(0) == "B"){
         ui->ac0_P->setValue(std::stof(tokens.at(1)));
         ui->ac0_T->setValue(std::stof(tokens.at(2)));
         ui->ac0_Q->setValue(std::stof(tokens.at(3)));
