@@ -35,6 +35,7 @@
 
 /* Here is the enumeration for gas based on the preprocessor definition above */
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air))
+DEFINE_ENUM_WITH_STRING_CONVERSIONS(alicat_type, (M)(MC)(V)(VC)(P))
 
 typedef struct alicat_data {
     float pressure;
@@ -58,10 +59,18 @@ public:
 
     alicat_data *parse_data(const std::string &dataIn);
 
+    void get_model_information();
+
+
 
 private:
     std::string address;
     std::string ID;
+    bool is_controller;
+    std::string serial_number;
+    int range;
+
+
 
 };
 

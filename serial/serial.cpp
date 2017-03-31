@@ -53,18 +53,7 @@ void Serial::read_complete(const boost::system::error_code& error, size_t bytes_
     { // read completed, so process the data
 
         data_handler(string(read_msg_));
-        string str_msg = string(read_msg_);
 
-
-        //string str_msg = string(msg);
-        //cout <<'\r' << str_msg << flush;
-        //boost::char_separator<char> sep(" ");
-        //boost::tokenizer<boost::char_separator<char>> tok(str_msg, sep);
-
-        /*for(boost::tokenizer<boost::char_separator<char>>::iterator beg=tok.begin(); beg!=tok.end();++beg){
-            cout << *beg << "\n";
-        }*/
-        //cout.write(read_msg_, bytes_transferred); // echo to standard output
         read_start(); // start waiting for another asynchronous read again
     }
     else

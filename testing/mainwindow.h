@@ -6,6 +6,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include "../serial/serial.h"
+#include "../serial/serialcomm.h"
 #include <functional>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -26,11 +27,12 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    boost::asio::io_service io_service_;
+    //boost::asio::io_service io_service_;
 
-    Serial serial_port;
+    //Serial serial_port;
+    SerialComm serial_port;
     //boost::thread t;
-    char* data;
+    //char* data;
 
     boost::filesystem::path file;
 

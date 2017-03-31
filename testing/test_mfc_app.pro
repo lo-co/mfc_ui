@@ -23,10 +23,12 @@ LIBS += -lboost_filesystem
 SOURCES += main.cpp\
         mainwindow.cpp \
     ../serial/serial.cpp \
-    ../alicat/alicat.cpp
+    ../alicat/alicat.cpp \
+    ../serial/serialcomm.cpp
 
 HEADERS  += mainwindow.h \
     ../serial/serial.h \
-    ../alicat/alicat.h
+    ../alicat/alicat.h \
+    ../serial/serialcomm.h
 
 FORMS    += mainwindow.ui

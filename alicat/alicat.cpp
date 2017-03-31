@@ -26,3 +26,8 @@ alicat_data *alicat::parse_data(const std::string &dataIn){
 
     return ac;
 }
+
+void alicat::get_model_information(){
+
+
+}

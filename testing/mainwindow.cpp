@@ -10,9 +10,12 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 #include <locale>
+#include <map>
 
 
 using namespace std;
+
+std::map<std::string, alicat_data> device_map;
 
 void MainWindow::simple_test(string msg){
     cout <<'\r' << msg << flush;
@@ -20,13 +23,20 @@ void MainWindow::simple_test(string msg){
     std::vector<string> tokens;
     boost::split(tokens, msg, boost::is_any_of(" "));
 
+    device_map[tokens.at(0)] = alicat_data(std::stof(tokens.at(1)),
+                                           std::stof(tokens.at(2)),
+                                           std::stof(tokens.at(3)),
+                                           std::stof(tokens.at(4)),
+                                           std::stof(tokens.at(5)),
+                                           Air);
+
+
     // Example of how to update controls for one of the controllers
-    if (tokens.at(0) == "B"){
-        ui->ac0_P->setValue(std::stof(tokens.at(1)));
-        ui->ac0_T->setValue(std::stof(tokens.at(2)));
-        ui->ac0_Q->setValue(std::stof(tokens.at(3)));
-        ui->ac0_Q0->setValue(std::stof(tokens.at(4)));
-    }
+    ui->ac0_P->setValue(device_map["B"].pressure);
+    ui->ac0_T->setValue(device_map["B"].temperature);
+    ui->ac0_Q->setValue(device_map["B"].flow_rate);
+    ui->ac0_Q0->setValue(device_map["B"].mass_flow_rate);
+    ui->ac0_Qsp->setValue(device_map["B"].setpoint);
 
 
 
@@ -46,9 +56,10 @@ bool alt = false;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    io_service_(),
-    serial_port(io_service_, 19200, "/dev/ttyUSB3", std::bind(&MainWindow::simple_test, this, std::placeholders::_1)),
-    data_path("data")
+    //io_service_(),
+    //serial_port(io_service_, 19200, "/dev/ttyUSB3", std::bind(&MainWindow::simple_test, this, std::placeholders::_1)),
+    serial_port(io_parameters("\r"), serial_setup("/dev/ttyUSB3"), std::bind(&MainWindow::simple_test, this, std::placeholders::_1))
+    //,data_path("data")
 {
     //callback = &MainWindow::simple_test;
     ui->setupUi(this);
@@ -60,11 +71,12 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(250);
 
     // Clear the line...
-    serial_port.write('\r');
-    serial_port.write('\r');
+    //serial_port.write('\r');
+    //serial_port.write('\r');
+    serial_port.writeString("\r\r");
 
     /* If the main data path does not exist, create it... */
-    if (!boost::filesystem::exists(data_path)) boost::filesystem::create_directory(data_path);
+    //if (!boost::filesystem::exists(data_path)) boost::filesystem::create_directory(data_path);
 
     getData();
 }
@@ -101,17 +113,22 @@ void MainWindow::on_mfc0SP_valueChanged(double arg1)
 
 void MainWindow::getData(){
 
-    io_service_.poll();
+    //io_service_.poll();
     ui->timeEdit->setTime(QTime::currentTime());
 
     // Alternate calls - what should really happen here is that we run
     // this at 1 Hz but pull all of the controllers much faster...
     // Also, this needs to be locked to prevent any writes from stepping on
     // each other
-    if (alt) serial_port.write('A');
+    /*if (alt) serial_port.writeString('A');
     else serial_port.write('B');
 
-    serial_port.write('\r');
+    serial_port.write('\r');*/
+
+    if (alt) serial_port.writeString("A\r");
+        else serial_port.writeString("B\r");
+
+    serial_port.readStrUntil();
 
     // Alternate the controller we are talking to.
     alt = !alt;
