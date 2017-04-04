@@ -3,6 +3,9 @@
 
 #include <string>
 #include <boost/preprocessor.hpp>
+#include <memory>
+#include <../serial/serialcomm.h>
+#include <../data.h>
 
 /* All of the above macros are used to convert strings returned from the
  * Alicat to an enum type defined in the macro invocation immediately
@@ -17,40 +20,42 @@
 
 #define DEFINE_ENUM_WITH_STRING_CONVERSIONS(name, enumerators)                \
     enum name {                                                               \
-        BOOST_PP_SEQ_ENUM(enumerators)                                        \
+    BOOST_PP_SEQ_ENUM(enumerators)                                        \
     };                                                                        \
-                                                                              \
+    \
     inline const char* ToString(name v)                                       \
-    {                                                                         \
-        switch (v)                                                            \
-        {                                                                     \
-            BOOST_PP_SEQ_FOR_EACH(                                            \
-                X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE,          \
-                name,                                                         \
-                enumerators                                                   \
-            )                                                                 \
-            default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
-        }                                                                     \
+{                                                                         \
+    switch (v)                                                            \
+{                                                                     \
+    BOOST_PP_SEQ_FOR_EACH(                                            \
+    X_DEFINE_ENUM_WITH_STRING_CONVERSIONS_TOSTRING_CASE,          \
+    name,                                                         \
+    enumerators                                                   \
+    )                                                                 \
+    default: return "[Unknown " BOOST_PP_STRINGIZE(name) "]";         \
+    }                                                                     \
     }
 
 /* Here is the enumeration for gas based on the preprocessor definition above */
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air))
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(alicat_type, (M)(MC)(V)(VC)(P))
 
-typedef struct alicat_data {
+struct alicat_data : Data {
+
     float pressure;
     float temperature;
     float flow_rate;
-    float mass_flow_rate;
-    float setpoint;
+    float mass_flow_rate;float setpoint;
     gas gas_;
 
     alicat_data(float p = 0, float T = 0, float Q = 0,
                 float Q0 = 0, float sp = 0, gas g = Air):pressure(p),
-                temperature(T), flow_rate(Q), mass_flow_rate(Q0),
-                setpoint(sp), gas_(g){}
+        temperature(T), flow_rate(Q), mass_flow_rate(Q0),
+        setpoint(sp), gas_(g){
+        setTime();
+    }
 
-} alicat_data;
+};
 
 class alicat
 {
@@ -61,6 +66,9 @@ public:
 
     void get_model_information();
 
+    Data get_data();
+
+
 
 
 private:
@@ -69,6 +77,10 @@ private:
     bool is_controller;
     std::string serial_number;
     int range;
+
+    std::shared_ptr<SerialComm> port;
+
+
 
 
 

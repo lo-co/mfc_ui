@@ -6,7 +6,9 @@
 #include <functional>
 
 /** @brief Provides a structure for configuring the serial port */
-typedef struct serial_setup {
+struct serial_setup {
+
+
 
     boost::asio::serial_port_base::parity par;
     boost::asio::serial_port_base::character_size c_size;
@@ -15,7 +17,6 @@ typedef struct serial_setup {
     std::string port;
     int baud;
     int timeout;
-
     /**
      * Constructor for flexible configuration of the serial port; this is an all or nothing
      * configuration.
@@ -37,7 +38,7 @@ typedef struct serial_setup {
                  std::string port_ = "/dev/ttyUSB0",
                  int baud_rate_ = 19200,
                  int timeout = 1000):par(parity_), c_size(c_size_), flow(flow_),
-                 s_bits(stop_bits), port(port_), baud(baud_rate_), timeout(timeout){}
+        s_bits(stop_bits), port(port_), baud(baud_rate_), timeout(timeout){}
 
     // Default setup for 19200, 8-N-1, no flow
     serial_setup(std::string port_):par(boost::asio::serial_port_base::parity::none),
@@ -49,25 +50,29 @@ typedef struct serial_setup {
         c_size(boost::asio::serial_port_base::character_size(8)),flow(boost::asio::serial_port_base::flow_control::none),
         s_bits(boost::asio::serial_port_base::stop_bits::one), port(port_), baud(baud_), timeout(1000){}
 
-} serial_setup;
+
+};
+
 
 /** Provides a structure for communication on the serial port. */
-typedef struct io_parameters{
-    bool fixed_size;
-    size_t size;
-    char* data;
-    std::string delim;
+struct io_parameters{
 
-    io_parameters(): fixed_size(false), delim(""), data(0), size(0) {}
+    std::string delim;
+    bool fixed_size;
+    char* data;
+    size_t size;
+
+    io_parameters(): delim(""), fixed_size(false), data(0), size(0) {}
 
     // Setup with just the delimiter
-    io_parameters(const std::string &delim_): fixed_size(false), delim(delim_), data(0), size(0) {}
+    io_parameters(const std::string &delim_): delim(delim_), fixed_size(false), data(0), size(0) {}
 
     // Provide a place for the data and the amount to read
-    io_parameters(char *data, size_t size): fixed_size(true),delim(""), data(data), size(size) { }
+    io_parameters(char *data, size_t size): delim(""), fixed_size(true),data(data), size(size) { }
 
 
-}io_parameters;
+
+};
 
 /*! Function typedef for handling the case where serial port reading is complete. */
 typedef std::function<void(std::string)> handler;
@@ -87,7 +92,9 @@ enum waitResult {
 class SerialComm
 {
 public:
-    SerialComm(io_parameters io, serial_setup serial, handler handler_);
+
+    SerialComm();
+    SerialComm(const io_parameters& io, const serial_setup& serial, handler handler_);
 
     /**
      * @brief Write a string to the port.
@@ -115,7 +122,7 @@ public:
      * @see boost::asio::serial_port::async_read_until
      * @see boost::async_wait
      */
-    void readStrUntil();
+    std::string readStrUntil();
 
     /**
      * @brief Closes the serial port.
@@ -126,11 +133,11 @@ public:
 
 
 private:
-    serial_setup port_params; /** Parameters used to setup communication with the current port */
     io_parameters io_params;  /** Parameters used for communicating with current port */
+    serial_setup port_params; /** Parameters used to setup communication with the current port */
+    boost::asio::io_service io_service_;
 
     boost::asio::serial_port port;
-    boost::asio::io_service io_service_;
 
     handler data_handler; /** Handler that will be to handle the data on a successful read */
 
@@ -140,7 +147,7 @@ private:
      * @param bytesTransferred
      */
     void readCompleted(const boost::system::error_code& error,
-            const size_t bytesTransferred);
+                       const size_t bytesTransferred);
 
     /**
      * @brief Handler for async_wait function
@@ -151,6 +158,8 @@ private:
     waitResult wait_result;
 
     size_t bytes_transferred;
+
+    boost::asio::deadline_timer timer;
 
 };
 

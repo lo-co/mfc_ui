@@ -31,3 +31,8 @@ void alicat::get_model_information(){
 
 
 }
+
+Data alicat::get_data(){
+    port->writeString(address + "\r");
+
+}

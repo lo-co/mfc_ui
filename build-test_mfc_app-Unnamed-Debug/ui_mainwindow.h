@@ -94,7 +94,7 @@ public:
         label_2->setGeometry(QRect(20, 380, 67, 17));
         layoutWidget = new QWidget(centralWidget);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(400, 100, 139, 281));
+        layoutWidget->setGeometry(QRect(450, 70, 139, 281));
         verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -172,7 +172,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 703, 23));
+        menuBar->setGeometry(QRect(0, 0, 703, 19));
         menuAlicat_Control = new QMenu(menuBar);
         menuAlicat_Control->setObjectName(QString::fromUtf8("menuAlicat_Control"));
         MainWindow->setMenuBar(menuBar);

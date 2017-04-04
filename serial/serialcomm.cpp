@@ -1,14 +1,24 @@
 #include "serialcomm.h"
 #include <boost/bind.hpp>
 #include <iostream>
+#include <boost/date_time.hpp>
+
+
+#define BOOST_ASIO_ENABLE_HANDLER_TRACKING
 
 using namespace boost::asio;
 using namespace std;
 
-SerialComm::SerialComm(io_parameters io,  serial_setup serial, handler handler_):
-    io_params(io),port_params(serial),
-    io_service_(), port(io_service_, port_params.port), data_handler(handler_)
+SerialComm::SerialComm(const io_parameters& io, const  serial_setup& serial, handler handler_):
+    io_params(io)
+  ,port_params(serial)
+  ,io_service_()
+  ,port(io_service_)
+  ,data_handler(handler_)
+  ,timer(io_service_)
 {
+
+    port.open(port_params.port);
 
     port.set_option(serial_port_base::baud_rate(port_params.baud));
     port.set_option(port_params.par);
@@ -24,12 +34,10 @@ void SerialComm::writeString(const string &s){
 }
 
 
-void SerialComm::readStrUntil(){
+std::string SerialComm::readStrUntil(){
 
     boost::asio::streambuf readData;
     string data_out = "";
-
-    deadline_timer  timer(io_service_, boost::posix_time::milliseconds(port_params.timeout));
 
     // Set up two things here - timer for waiting and a async_read to read
     // If async_read returns first - success! Else, something happened
@@ -38,46 +46,60 @@ void SerialComm::readStrUntil(){
         //Set up for wait and read.
         wait_result = in_progress;
 
-        timer.async_wait(boost::bind(&SerialComm::timeoutExpired,this,
-                                     boost::asio::placeholders::error));
-
         async_read_until(port,readData,io_params.delim,
                          boost::bind(&SerialComm::readCompleted,
                                      this,boost::asio::placeholders::error,
                                      boost::asio::placeholders::bytes_transferred));
 
+        timer.expires_from_now(boost::posix_time::milliseconds(1000));
+        timer.async_wait(boost::bind(&SerialComm::timeoutExpired,this,
+                                     boost::asio::placeholders::error));
 
-        // This blocks until an event on io_service_ is set.
 
-        io_service_.run_one();
+        // The loop is required in the case where events are thrown that are
+        // related to canceling operations.
+        for (;;){
+            // This blocks until an event on io_service_ is set.
+            io_service_.run_one();
 
+            // Brackets in success case limit scope of new variables
+            switch(wait_result){
+            case success:{
 
-        // Brackets in success case limit scope of new variables
-        switch(wait_result){
-        case success:{
-            timer.cancel();
-            // Remove the delimiter byte - don't want this.
-            bytes_transferred -= 1;
-            istream is(&readData);
-            // Allocation of string
-            string msg(bytes_transferred, '\0');
+                // Remove the delimiter byte - don't want this.
+                bytes_transferred -= 1;
+                istream is(&readData);
+                // Allocation of string
+                string msg(bytes_transferred, '\0');
+                data_out = msg;
 
-            is.read(&msg[0], bytes_transferred);
-            // Remove the delimiter
-            is.ignore(1);
-            data_handler(msg);
-            break ;}
-        case timeout_expired:
-            cout << "Time is up..." << endl;
-            break ;
-        case error_out:
-            cout << "Serial port error read..." << endl;
-            break ;
-        case in_progress:
-            break;
+                is.read(&msg[0], bytes_transferred);
+
+                // Remove the delimiter
+                is.ignore(1);
+
+                data_handler(msg);
+
+                return msg;
+            }
+
+            case timeout_expired:
+                cout << "Time is up..." << endl;
+                return data_out;
+                break ;
+            case error_out:
+                cout << "Error out..." << endl;
+                return data_out;
+                break ;
+            case in_progress:
+                cout << "In progress..." << endl;
+                break;
+            }
+
         }
-
     }
+
+    return data_out;
 }
 
 
@@ -87,12 +109,31 @@ void SerialComm::readCompleted(const boost::system::error_code& error,
         wait_result = success;
         bytes_transferred = bytesTransferred;
     }
-    else {wait_result = error_out;}
+    else {if (error.value() != 125) wait_result = error_out;}
+    try{
+
+
+        timer.cancel();
+        cout << "Timer canceled on read.  Error was " + to_string(error.value()) << endl;
+    }
+    catch(std::exception const &e){
+        cout << "tried to cancel timer but got error..." <<endl;
+    }
 
 }
 
 void SerialComm::timeoutExpired(const boost::system::error_code &error){
-    if (!error && wait_result == in_progress){wait_result = timeout_expired;}
+    if (!error && wait_result == in_progress) wait_result = timeout_expired;
+    else {if (error.value() != 125) wait_result = error_out;}
+
+    try{
+        port.cancel();
+        cout << "Port canceled on timeout.  Error was " + to_string(error.value()) << endl;
+    }
+    catch(std::exception const &e){
+        cout << "tried to cancel read on port but got error..." <<endl;
+    }
+
 
 }
 

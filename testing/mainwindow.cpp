@@ -11,14 +11,24 @@
 #include <iostream>
 #include <locale>
 #include <map>
+#include <boost/bind.hpp>
 
 
 using namespace std;
 
 std::map<std::string, alicat_data> device_map;
 
+serial_setup tempSerial= {boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none),
+                           boost::asio::serial_port_base::character_size(8),
+                           boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none),
+                          boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one),
+                           "/dev/ttyUSB0",
+                           19200,
+                           1000
+                         };
+
 void MainWindow::simple_test(string msg){
-    cout <<'\r' << msg << flush;
+    //cout <<'\r' << msg << flush;
 
     std::vector<string> tokens;
     boost::split(tokens, msg, boost::is_any_of(" "));
@@ -53,15 +63,17 @@ void MainWindow::simple_test(string msg){
 
 bool alt = false;
 
+string tempDev = "/dev/ttyUSB3";
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    //io_service_(),
-    //serial_port(io_service_, 19200, "/dev/ttyUSB3", std::bind(&MainWindow::simple_test, this, std::placeholders::_1)),
-    serial_port(io_parameters("\r"), serial_setup("/dev/ttyUSB3"), std::bind(&MainWindow::simple_test, this, std::placeholders::_1))
-    //,data_path("data")
+    serial_port(io_parameters("\r")
+                ,serial_setup("/dev/ttyUSB3")
+                ,std::bind(&MainWindow::simple_test, this,std::placeholders::_1)
+                )
 {
-    //callback = &MainWindow::simple_test;
     ui->setupUi(this);
 
     QTimer *timer = new QTimer(this);
@@ -71,14 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start(250);
 
     // Clear the line...
-    //serial_port.write('\r');
-    //serial_port.write('\r');
     serial_port.writeString("\r\r");
-
-    /* If the main data path does not exist, create it... */
-    //if (!boost::filesystem::exists(data_path)) boost::filesystem::create_directory(data_path);
-
-    getData();
 }
 
 MainWindow::~MainWindow()
@@ -92,26 +97,22 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_mfc0SP_valueChanged(double arg1)
 {
+    boost::lock_guard<boost::mutex> guard(mtx);
+    //boost::lock_guard<MainWindow> guard(*this);
     //serial_port.write
     std::cout << "Current value of control is: " +
                  std::to_string(ui->mfc0SP->value()) << std::endl;
 
-    /* char* flow_int = std::to_string(int(ui->mfc0SP->value()*64000/100));
+    string flow_int = to_string(int(ui->mfc0SP->value()*64000/100));
 
-    serial_port.write('A');
-
-
-
-    serial_port.write(flow_int);
-    serial_port.write('\r');
-
-    */
-    // A delay should be added to make sure that there is no
-    // collision...
+    serial_port.writeString("A" + flow_int + "\r");
+    serial_port.readStrUntil();
 
 }
 
 void MainWindow::getData(){
+    boost::lock_guard<boost::mutex> guard(mtx);
+    //boost::lock_guard<MainWindow> guard(*this);
 
     //io_service_.poll();
     ui->timeEdit->setTime(QTime::currentTime());
@@ -125,7 +126,7 @@ void MainWindow::getData(){
 
     serial_port.write('\r');*/
 
-    if (alt) serial_port.writeString("A\r");
+   if (alt) serial_port.writeString("A\r");
         else serial_port.writeString("B\r");
 
     serial_port.readStrUntil();
