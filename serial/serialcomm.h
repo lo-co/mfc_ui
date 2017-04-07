@@ -82,7 +82,9 @@ enum waitResult {
     in_progress, /** Port is currently busy with a read. */
     success, /** Read has returned without error */
     error_out, /** Error detected on port */
-    timeout_expired /** No error detected but timer has expired */
+    timeout_expired, /** No error detected but timer has expired */
+    op_canceled,
+    port_cancelled
 };
 
 /**
@@ -138,6 +140,7 @@ private:
     boost::asio::io_service io_service_;
 
     boost::asio::serial_port port;
+    boost::asio::streambuf readData;
 
     handler data_handler; /** Handler that will be to handle the data on a successful read */
 
