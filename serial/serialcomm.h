@@ -127,6 +127,28 @@ public:
     std::string readStrUntil();
 
     /**
+     * @brief Provides an entry point for reading followed by writing to port
+     *
+     * Simple method that calls two other methods thus allowing the caller
+     * to lock the port to prevent interference on the line when a read followed
+     * by a write is needed
+     *
+     * @param w_str String to write to the port
+     * @param multiline Boolean indicating whether the system should expect to poll for
+     * more than one line.  This parameter is not used if the read is not set to terminate
+     * on a delimeter.
+     *
+     * @return String read from port line after command is issued.  Will be empty if the read
+     * operation timed out.
+     *
+     * @see readStrUntil
+     * @see writeString
+     *
+     *
+     */
+    std::string async_rw(std::string w_str, bool multiline = false);
+
+    /**
      * @brief Closes the serial port.
      *
      * @see boost::asio::serial_port::close

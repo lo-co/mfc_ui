@@ -1,27 +1,36 @@
 #include "alicat.h"
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
-alicat::alicat(std::string addr, std::string id): address(addr), ID(id)
+using namespace std;
+
+alicat::alicat(const char &addr, const std::string &id, std::shared_ptr<SerialComm> port_):
+    address(addr), ID(id), port(port_)
 {
 
 }
-alicat_data *alicat::parse_data(const std::string &dataIn){
+alicat_data alicat::parse_data(const std::string &msg){
 
-    alicat_data *ac;
+    alicat_data ac = {0,0,0,0,0,Air};
 
-    ac->flow_rate = 0;
-    ac->gas_ = Air;
-    ac->mass_flow_rate = 0;
-    ac->temperature = 0;
-    ac->pressure = 0;
-    ac->setpoint = 0;
 
-    boost::char_separator<char> sep(" ");
-    boost::tokenizer<boost::char_separator<char>> tok(dataIn, sep);
+    if(isprint(msg[0])){
+        try{
+            std::vector<string> tokens;
+            boost::split(tokens, msg, boost::is_any_of(" "));
 
-    /*for(boost::tokenizer<boost::char_separator<char>>::iterator beg=tok.begin(); beg!=tok.end();++beg){
-        cout << *beg << "\n";
-    }*/
+            ac = alicat_data(std::stof(tokens.at(1)),
+                             std::stof(tokens.at(2)),
+                             std::stof(tokens.at(3)),
+                             std::stof(tokens.at(4)),
+                             std::stof(tokens.at(5)),
+                             Air);
+        }
+        catch(std::exception const &e){
+            cout << msg <<endl;
+            cout << "Exception thrown in simple_test.  EC: "  + string(e.what(), 100)<<endl;
+        }
+    }
 
 
     return ac;
@@ -33,6 +42,10 @@ void alicat::get_model_information(){
 }
 
 Data alicat::get_data(){
-    port->writeString(address + "\r");
+
+    alicat_data ac_data = {0, 0, 0, 0, 0, Air};
+    //parse_data(port->async_rw(std::string(&address) + "\r"));
+
+    return (Data) ac_data;
 
 }

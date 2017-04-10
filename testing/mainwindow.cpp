@@ -114,8 +114,7 @@ void MainWindow::on_mfc0SP_valueChanged(double sp)
 {
     boost::lock_guard<boost::mutex> guard(mtx);
 
-    serial_port.writeString("A" + to_string(int(sp*64000/100)) + "\r");
-    serial_port.readStrUntil();
+    serial_port.async_rw("A" + to_string(int(sp*64000/100)) + "\r");
 
 }
 
@@ -131,10 +130,8 @@ void MainWindow::getData(){
         // Also, this needs to be locked to prevent any writes from stepping on
         // each other
 
-        if (alt) serial_port.writeString("A\r");
-        else serial_port.writeString("B\r");
-
-        serial_port.readStrUntil();
+        if (alt) serial_port.async_rw("A\r");
+        else serial_port.async_rw("B\r");
 
         // Alternate the controller we are talking to.
         alt = !alt;
@@ -168,7 +165,6 @@ void MainWindow::on_mfc1SP_valueChanged(double sp)
 {
     boost::lock_guard<boost::mutex> guard(mtx);
 
-    serial_port.writeString("B" + to_string(int(sp*64000/100)) + "\r");
-    serial_port.readStrUntil();
+    serial_port.async_rw("B" + to_string(int(sp*64000/100)) + "\r");
 
 }

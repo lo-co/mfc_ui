@@ -47,7 +47,13 @@ void SerialComm::writeString(const string &s){
     write(port, buffer(s.c_str(), s.size()));
 }
 
+std::string SerialComm::async_rw(std::string w_str, bool multiline){
+    writeString(w_str);
+    return readStrUntil();
+}
 
+
+// TODO: make read more generic...
 std::string SerialComm::readStrUntil(){
 
     //++index_;
