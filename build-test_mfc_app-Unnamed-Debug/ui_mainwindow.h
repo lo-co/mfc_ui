@@ -65,6 +65,8 @@ public:
     QDoubleSpinBox *ac1_Q0;
     QLabel *label_12;
     QDoubleSpinBox *ac1_Qsp;
+    QDoubleSpinBox *mfc1SP;
+    QLabel *label_13;
     QMenuBar *menuBar;
     QMenu *menuAlicat_Control;
     QToolBar *mainToolBar;
@@ -79,10 +81,10 @@ public:
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         mfc0SP = new QDoubleSpinBox(centralWidget);
         mfc0SP->setObjectName(QString::fromUtf8("mfc0SP"));
-        mfc0SP->setGeometry(QRect(30, 80, 66, 23));
+        mfc0SP->setGeometry(QRect(30, 40, 66, 23));
         label = new QLabel(centralWidget);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(30, 60, 111, 16));
+        label->setGeometry(QRect(30, 20, 111, 16));
         QFont font;
         font.setFamily(QString::fromUtf8("Roboto"));
         font.setBold(true);
@@ -249,6 +251,13 @@ public:
 
         verticalLayout_2->addWidget(ac1_Qsp);
 
+        mfc1SP = new QDoubleSpinBox(centralWidget);
+        mfc1SP->setObjectName(QString::fromUtf8("mfc1SP"));
+        mfc1SP->setGeometry(QRect(40, 90, 66, 23));
+        label_13 = new QLabel(centralWidget);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setGeometry(QRect(40, 70, 111, 16));
+        label_13->setFont(font);
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -291,6 +300,7 @@ public:
         label_10->setText(QApplication::translate("MainWindow", "Q (lpm)", 0, QApplication::UnicodeUTF8));
         label_11->setText(QApplication::translate("MainWindow", "Q0 (slpm)", 0, QApplication::UnicodeUTF8));
         label_12->setText(QApplication::translate("MainWindow", "Qsp (lpm)", 0, QApplication::UnicodeUTF8));
+        label_13->setText(QApplication::translate("MainWindow", "Alicat 1 SP", 0, QApplication::UnicodeUTF8));
         menuAlicat_Control->setTitle(QApplication::translate("MainWindow", "Alicat Control", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
+      <y>40</y>
       <width>66</width>
       <height>23</height>
      </rect>
@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>60</y>
+      <y>20</y>
       <width>111</width>
       <height>16</height>
      </rect>
@@ -336,6 +336,36 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QDoubleSpinBox" name="mfc1SP">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>90</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>70</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto</family>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Alicat 1 SP</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

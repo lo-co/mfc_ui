@@ -47,6 +47,7 @@ private slots:
     void getData();
     void on_saveButton_clicked(bool checked);
 
+    void on_mfc1SP_valueChanged(double arg1);
 };
 
 #endif // MAINWINDOW_H

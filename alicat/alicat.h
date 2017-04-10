@@ -38,6 +38,7 @@
 
 /* Here is the enumeration for gas based on the preprocessor definition above */
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air))
+
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(alicat_type, (M)(MC)(V)(VC)(P))
 
 struct alicat_data : Data {
