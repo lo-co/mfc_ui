@@ -4,6 +4,13 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <functional>
+#include <boost/exception/error_info.hpp>
+
+
+struct error : virtual std::exception, virtual boost::exception { };
+struct port_error : virtual error { };
+struct port_timeout_error : virtual port_error{};
+struct bytes_read_error : virtual port_error{};
 
 /** @brief Provides a structure for configuring the serial port */
 struct serial_setup {
@@ -102,7 +109,8 @@ public:
      * @brief Write a string to the port.
      *
      * Calls the write function in basic_serial_port, creating a buffer from the string
-     * provided to write to the port
+     * provided to write to the port.  If a delimiter is defined in the ``io_parameters``
+     * variable, then the write will append the delimiter to the write string.
      *
      * @param s String to write to the port.
      *
@@ -123,6 +131,10 @@ public:
      *
      * @see boost::asio::serial_port::async_read_until
      * @see boost::async_wait
+     *
+     * @todo Make the functionality defined here more generic to handle the case when
+     * we just want to read a fixed number of bytes or for a fixed period.
+     * @todo Maybe should raise an exception if failure to read or a timeout?
      */
     std::string readStrUntil();
 
@@ -144,6 +156,9 @@ public:
      * @see readStrUntil
      * @see writeString
      *
+     *
+     * @todo Handle case where there are multiple lines.  Currently the multiline parameter
+     * doesn't do anything.
      *
      */
     std::string async_rw(std::string w_str, bool multiline = false);

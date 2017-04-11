@@ -9,11 +9,14 @@ alicat::alicat(const char &addr, const std::string &id, std::shared_ptr<SerialCo
 {
 
 }
+
+/** @todo Make this routine dependent on the model of the alicat. */
 alicat_data alicat::parse_data(const std::string &msg){
 
     alicat_data ac = {0,0,0,0,0,Air};
 
 
+    // If the first character is not printable, don't try to parse it.
     if(isprint(msg[0])){
         try{
             std::vector<string> tokens;
@@ -39,6 +42,10 @@ alicat_data alicat::parse_data(const std::string &msg){
 void alicat::get_model_information(){
 
 
+}
+
+void alicat::set_gas(gas g){
+    port->writeString(string(&address) + "$$" + to_string((int)g));
 }
 
 Data alicat::get_data(){

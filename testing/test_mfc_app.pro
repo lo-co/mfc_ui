@@ -28,6 +28,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     ../alicat/alicat.h \
     ../serial/serialcomm.h \
-    ../data.h
+    ../data.h \
+    ../general_definitions.h
 
 FORMS    += mainwindow.ui

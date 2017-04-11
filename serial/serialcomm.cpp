@@ -5,19 +5,8 @@
 #include <boost/timer.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include <fstream>
-
-
-#define BOOST_ASIO_ENABLE_HANDLER_TRACKING
-
 using namespace boost::asio;
 using namespace std;
-
-ofstream test_file;
-
-boost::timer* timer_ = new boost::timer();
-size_t n_handlers;
-int index_ = 0;
 
 SerialComm::SerialComm(const io_parameters& io, const  serial_setup& serial, handler handler_):
     io_params(io)
@@ -36,27 +25,30 @@ SerialComm::SerialComm(const io_parameters& io, const  serial_setup& serial, han
     port.set_option(port_params.flow);
     port.set_option(port_params.s_bits);
 
-    test_file.open("/home/mrichardson/record_data.txt");
-
-
-
 }
 
 
 void SerialComm::writeString(const string &s){
+
+    string delim_str = s;
+
+    // Add the delimiter if there is one specified
+    if (io_params.delim != "") delim_str = s + io_params.delim;
+
     write(port, buffer(s.c_str(), s.size()));
 }
 
 std::string SerialComm::async_rw(std::string w_str, bool multiline){
+
     writeString(w_str);
-    return readStrUntil();
+    string r_string =readStrUntil();
+
+    if (multiline) {while (r_string != (r_string += readStrUntil())){}}
+
+    return r_string;
 }
 
-
-// TODO: make read more generic...
 std::string SerialComm::readStrUntil(){
-
-    //++index_;
 
     string data_out = "";
 
@@ -73,9 +65,6 @@ std::string SerialComm::readStrUntil(){
                                          this,boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
 
-
-
-            //timer_->restart();
             timer.expires_from_now(boost::posix_time::seconds(1));
             timer.async_wait(boost::bind(&SerialComm::timeoutExpired,this,
                                          boost::asio::placeholders::error));
@@ -88,18 +77,16 @@ std::string SerialComm::readStrUntil(){
         // The loop is required in the case where events are thrown that are
         // related to canceling operations.
         for (;;){
-            // This blocks until an event on io_service_ is set.
-            n_handlers = io_service_.run_one();
 
+            // This blocks until an event on io_service_ is set.
+            io_service_.run_one();
 
             // Brackets in success case limit scope of new variables
             switch(wait_result){
             case success:{
 
-                string delims = "\r";
-
                 std::string msg{buffers_begin(readData.data()),
-                            buffers_begin(readData.data()) + bytes_transferred- delims.size()};
+                            buffers_begin(readData.data()) + bytes_transferred- io_params.delim.size()};
 
                 // Consume through the first delimiter.
                 readData.consume(bytes_transferred);
