@@ -81,6 +81,7 @@ struct io_parameters{
 
 };
 
+/** @todo Get rid of this... */
 /*! Function typedef for handling the case where serial port reading is complete. */
 typedef std::function<void(std::string)> handler;
 
@@ -103,7 +104,10 @@ class SerialComm
 public:
 
     SerialComm();
-    SerialComm(const io_parameters& io, const serial_setup& serial, handler handler_);
+    SerialComm(const io_parameters& io, const serial_setup& serial);
+    ~SerialComm();
+
+    inline bool isOpen(){return port.is_open();}
 
     /**
      * @brief Write a string to the port.
@@ -179,7 +183,7 @@ private:
     boost::asio::serial_port port;
     boost::asio::streambuf readData;
 
-    handler data_handler; /** Handler that will be to handle the data on a successful read */
+    //handler data_handler; /** Handler that will be to handle the data on a successful read */
 
     /**
      * @brief Handler that is called by the read function.

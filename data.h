@@ -4,6 +4,7 @@
 #include <boost/date_time.hpp>
 
 
+
 /**
  * @brief Container for data returned from measurement devices.
  */
@@ -17,6 +18,7 @@ struct Data{
      * @see boost::posix_time::second_clock::local_time()
      */
     void setTime(){mTime = boost::posix_time::second_clock::local_time();}
+    virtual std::string serialize2ascii(){return "";};
 
 
 };

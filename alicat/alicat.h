@@ -11,8 +11,8 @@
 
 #include <string>
 #include <memory>
-#include <../serial/serialcomm.h>
-#include <../data.h>
+#include "../serial/serialcomm.h"
+#include "../data.h"
 #include "../general_definitions.h"
 
 /** Enumeration defining the gas type that flow is currently calculated for
@@ -55,6 +55,12 @@ struct alicat_data : Data {
         setTime();
     }
 
+
+    virtual std::string serialize2ascii(){return std::to_string(pressure)
+                + "\t" + std::to_string(temperature)
+                + "\t" + std::to_string(flow_rate) + "\t" + std::to_string(mass_flow_rate)
+                + std::to_string(setpoint);}
+
 };
 
 
@@ -89,7 +95,9 @@ public:
      */
     void set_gas(gas g);
 
-    Data get_data();
+    Data* get_data();
+
+    ~alicat();
 
 private:
     char address; /** Single ascii character (A-Z) representing the device address */

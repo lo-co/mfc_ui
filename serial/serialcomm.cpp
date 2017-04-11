@@ -8,12 +8,11 @@
 using namespace boost::asio;
 using namespace std;
 
-SerialComm::SerialComm(const io_parameters& io, const  serial_setup& serial, handler handler_):
+SerialComm::SerialComm(const io_parameters& io, const  serial_setup& serial):
     io_params(io)
   ,port_params(serial)
   ,io_service_()
   ,port(io_service_)
-  ,data_handler(handler_)
   ,timer(io_service_)
 {
 
@@ -91,7 +90,7 @@ std::string SerialComm::readStrUntil(){
                 // Consume through the first delimiter.
                 readData.consume(bytes_transferred);
 
-                data_handler(msg);
+                //data_handler(msg);
 
                 return data_out;
 
@@ -159,6 +158,10 @@ void SerialComm::timeoutExpired(const boost::system::error_code &error){
 
 void SerialComm::close(){
     port.close();
-    test_file.close();
     
+}
+
+SerialComm::~SerialComm(){
+    cout << "Closing serial port now..." << endl;
+    port.close();
 }

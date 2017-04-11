@@ -1,6 +1,9 @@
 #include "alicat.h"
+#include <iostream>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/find.hpp>
+
 
 using namespace std;
 
@@ -35,24 +38,41 @@ alicat_data alicat::parse_data(const std::string &msg){
         }
     }
 
-
     return ac;
 }
 
 void alicat::get_model_information(){
 
+    string model_data = port->async_rw(string(&address) + "??M*");
+    string line; // Inidividual lines of test in the model_data string
 
+    stringstream ss(model_data);
+
+    //boost::iterator_range<string> model_range;
+
+    while(std::getline(ss, line)){
+        if (boost::find_first(line, "Model") || boost::find_first(line, "Mdl")){
+
+        }
+
+
+
+    }
 }
 
 void alicat::set_gas(gas g){
     port->writeString(string(&address) + "$$" + to_string((int)g));
 }
 
-Data alicat::get_data(){
+Data *alicat::get_data(){
 
-    alicat_data ac_data = {0, 0, 0, 0, 0, Air};
+    alicat_data* ac_data = new alicat_data(0, 0, 0, 0, 0, Air);
     //parse_data(port->async_rw(std::string(&address) + "\r"));
 
-    return (Data) ac_data;
+    return (Data *) ac_data;
 
+}
+
+alicat::~alicat(){
+    cout << "Alicat with ID " + ID + " closed." << endl;
 }

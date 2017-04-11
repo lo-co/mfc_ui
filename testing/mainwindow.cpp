@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     serial_port(io_parameters("\r")
                 ,serial_setup("/dev/ttyUSB3")
-                ,std::bind(&MainWindow::simple_test, this,std::placeholders::_1)
+                //,std::bind(&MainWindow::simple_test, this,std::placeholders::_1)
                 )
 {
     ui->setupUi(this);
