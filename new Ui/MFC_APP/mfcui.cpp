@@ -3,6 +3,12 @@
 #include <qt4/QtCore/QTimer>
 #include <iostream>
 #include "../../alicat/alicat.h"
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/find.hpp>
+
+using namespace boost;
+
 
 MfcUi::MfcUi(QWidget *parent) :
     QMainWindow(parent),
@@ -12,11 +18,27 @@ MfcUi::MfcUi(QWidget *parent) :
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(getData()));
 
-    port = std::shared_ptr<SerialComm>(new SerialComm(io_parameters("\r")
-                                                      ,serial_setup("/dev/ttyUSB3")));
+    property_tree::ini_parser::read_ini("/home/mrichardson/alicat.ini", pt);
 
-    alicat_map["AlicatA"] = new alicat('A', "AlicatA", std::shared_ptr<SerialComm>(port));
-    alicat_map["AlicatB"] = new alicat('B', "AlicatB", std::shared_ptr<SerialComm>(port));
+    std::vector<std::string> IDs;
+
+    std::string ids = pt.get<std::string>("Alicat.IDs");
+
+    boost::split(IDs, ids, boost::is_any_of(","));
+
+    port = std::shared_ptr<SerialComm>(new SerialComm(io_parameters("\r")
+                                                      ,serial_setup(pt.get<std::string>("Alicat.Port"))));
+
+
+    for (auto &id : IDs){
+
+        std::string key_addr = "Alicat." + id + "_Address";
+
+        char addr = pt.get<char>(key_addr);
+
+
+        alicat_map[id] = new alicat(addr, id, std::shared_ptr<SerialComm>(port));
+    }
     //alicat(const char &addr, const std::string &id, std::shared_ptr<SerialComm> port_)
 
     // This is polling pretty fast...
