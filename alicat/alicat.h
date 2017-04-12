@@ -59,7 +59,7 @@ struct alicat_data : Data {
     virtual std::string serialize2ascii(){return std::to_string(pressure)
                 + "\t" + std::to_string(temperature)
                 + "\t" + std::to_string(flow_rate) + "\t" + std::to_string(mass_flow_rate)
-                + std::to_string(setpoint);}
+                + "\t" + std::to_string(setpoint);}
 
 };
 

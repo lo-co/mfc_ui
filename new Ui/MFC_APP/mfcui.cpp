@@ -37,7 +37,18 @@ void MfcUi::getData(){
         for (auto const &ent : alicat_map){
 
             alicat_data *data = (alicat_data*)ent.second->get_data();
-            std::cout << ent.first + "\t" + data->serialize2ascii() << std::endl;
+            //std::cout << ent.first + "\t" + data->serialize2ascii() << std::endl;
+
+            if(ent.first == "AlicatA"){
+
+                alicat_data data_ = *data;
+                // Example of how to update controls for one of the controllers
+                ui->ac0_P->setValue(data_.pressure);
+                ui->ac0_T->setValue(data_.temperature);
+                ui->ac0_Q->setValue(data_.flow_rate);
+                ui->ac0_Q0->setValue(data_.mass_flow_rate);
+                ui->ac0_Qsp->setValue(data_.setpoint);
+            }
         }
 
     }

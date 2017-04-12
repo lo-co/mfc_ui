@@ -34,10 +34,10 @@ void SerialComm::writeString(const string &s){
     // Add the delimiter if there is one specified
     if (io_params.delim != "") delim_str = s + io_params.delim;
 
-    write(port, buffer(s.c_str(), s.size()));
+    write(port, buffer(delim_str.c_str(), delim_str.size()));
 }
 
-std::string SerialComm::async_rw(std::string w_str, bool multiline){
+std::string SerialComm::async_rw(string w_str, bool multiline){
 
     writeString(w_str);
     string r_string =readStrUntil();
@@ -92,7 +92,7 @@ std::string SerialComm::readStrUntil(){
 
                 //data_handler(msg);
 
-                return data_out;
+                return msg;
 
             }
             case timeout_expired:

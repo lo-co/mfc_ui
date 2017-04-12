@@ -25,12 +25,11 @@ alicat_data alicat::parse_data(const std::string &msg){
             std::vector<string> tokens;
             boost::split(tokens, msg, boost::is_any_of(" "));
 
-            ac = alicat_data(std::stof(tokens.at(1)),
-                             std::stof(tokens.at(2)),
-                             std::stof(tokens.at(3)),
-                             std::stof(tokens.at(4)),
-                             std::stof(tokens.at(5)),
-                             Air);
+            alicat_data *ac_ = new alicat_data(stof(tokens.at(1)), stof(tokens.at(2)),
+                                   stof(tokens.at(3)),stof(tokens.at(4)),
+                                   stof(tokens.at(5)), Air);
+
+            ac = *ac_;
         }
         catch(std::exception const &e){
             cout << msg <<endl;
@@ -67,9 +66,12 @@ void alicat::set_gas(gas g){
 Data *alicat::get_data(){
 
     alicat_data* ac_data = new alicat_data(0, 0, 0, 0, 0, Air);
-    //parse_data(port->async_rw(std::string(&address) + "\r"));
 
-    return (Data *) ac_data;
+    alicat_data addr_data = parse_data(port->async_rw(string(1, address)));
+
+    ac_data = &addr_data;
+
+    return (Data*) ac_data;
 
 }
 
