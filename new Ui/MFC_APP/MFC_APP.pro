@@ -27,6 +27,7 @@ HEADERS  += mfcui.h \
     ../../alicat/alicat.h \
     ../../serial/serialcomm.h \
     ../../general_definitions.h \
-    ../../data.h
+    ../../data.h \
+    ../../device/device.h
 
 FORMS    += mfcui.ui

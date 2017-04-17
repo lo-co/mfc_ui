@@ -8,7 +8,7 @@
 using namespace std;
 
 alicat::alicat(const char &addr, const std::string &id, std::shared_ptr<SerialComm> port_):
-    address(addr), ID(id), port(port_)
+    address(addr), port(port_), Device(id)
 {
 
 }
@@ -26,8 +26,8 @@ alicat_data alicat::parse_data(const std::string &msg){
             boost::split(tokens, msg, boost::is_any_of(" "));
 
             alicat_data *ac_ = new alicat_data(stof(tokens.at(1)), stof(tokens.at(2)),
-                                   stof(tokens.at(3)),stof(tokens.at(4)),
-                                   stof(tokens.at(5)), Air);
+                                               stof(tokens.at(3)),stof(tokens.at(4)),
+                                               stof(tokens.at(5)), Air);
 
             ac = *ac_;
         }
@@ -47,15 +47,39 @@ void alicat::get_model_information(){
 
     stringstream ss(model_data);
 
-    //boost::iterator_range<string> model_range;
-
     while(std::getline(ss, line)){
+
+        // Search each line for the Model or Mdl key-word
         if (boost::find_first(line, "Model") || boost::find_first(line, "Mdl")){
 
+            // Break the line up into tokens delimited by spaces
+            std::vector<string> tokens;
+            boost::split(tokens, line, boost::is_any_of(" "));
+
+            // Subtokens break up the token into bits if a hyphen is detected...
+            std::vector<string> subtokens;
+
+            for (auto const& token: tokens){
+                boost::split(subtokens, token, boost::is_any_of("-"));
+
+                /* The model definition looks something like MC-100SCCM-D
+                 * Hyphen found if more than one token.  Tokens defined as:
+                 *   * Type - MC, M, VC, V, PC, V where the C defines the type as controller
+                 *   * Range + units
+                 *   * Not sure what this is.
+                 */
+                if (subtokens.size() > 1){
+                    for (auto const&stoken: subtokens){
+
+                        cout << stoken <<endl;
+                    }
+                    break;
+                }
+
+
+
+            }
         }
-
-
-
     }
 }
 
@@ -75,6 +99,25 @@ Data *alicat::get_data(){
 
 }
 
+void alicat::configure_device(boost::property_tree::ptree pt){
+
+    if (!port->isOpen()){
+        port->open(pt.get<std::string>("Alicat.Port"));
+    }
+
+    address = pt.get<char>( "Alicat." + dev_id + "_Address");
+
+    set_flow_rate(pt.get<float>("Alicat." + dev_id + "_Q0"));
+
+    get_model_information();
+
+}
+
+void alicat::set_flow_rate(float q){
+
+    port->async_rw(string(1, address) + to_string(int(q*64000/max_flow)));
+}
+
 alicat::~alicat(){
-    cout << "Alicat with ID " + ID + " closed." << endl;
+    cout << "Alicat with ID " + dev_id + " closed." << endl;
 }

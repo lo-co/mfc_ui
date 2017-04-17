@@ -107,6 +107,8 @@ public:
     SerialComm(const io_parameters& io, const serial_setup& serial);
     ~SerialComm();
 
+    inline void open(std::string port_){port.open(port_);}
+
     inline bool isOpen(){return port.is_open();}
 
     /**

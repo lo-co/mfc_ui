@@ -14,6 +14,7 @@
 #include "../serial/serialcomm.h"
 #include "../data.h"
 #include "../general_definitions.h"
+#include "../device/device.h"
 
 /** Enumeration defining the gas type that flow is currently calculated for
  * @todo Fill list out.
@@ -70,7 +71,7 @@ struct alicat_data : Data {
  * @todo Make generic device for inheriting from.
  *
  */
-class alicat
+class alicat:Device
 {
 public:
     /**
@@ -95,13 +96,16 @@ public:
      */
     void set_gas(gas g);
 
-    Data* get_data();
+    virtual Data* get_data();
+
+    virtual void configure_device(boost::property_tree::ptree pt);
+
+    void set_flow_rate(float q);
 
     ~alicat();
 
 private:
     char address; /** Single ascii character (A-Z) representing the device address */
-    std::string ID; /** Unique ID used to represent the device */
     bool is_controller; /** Boolean representing whether the device is a controller */
     std::string serial_number; /** Serial number of the device */
     int range; /** Range of controller. Units are dependent on the controller itself. */
@@ -122,6 +126,8 @@ private:
     alicat_data parse_data(const std::string &msg);
 
     std::shared_ptr<SerialComm> port; /** IOC for the serial port... */
+
+    float max_flow;
 
 
 
