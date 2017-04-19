@@ -27,10 +27,14 @@ private:
 
     boost::property_tree::ptree pt;
 
+    std::vector<std::string> IDs;
+
 
 
 private slots:
     void getData();
+    void on_ac0SP_valueChanged(double sp);
+    void on_ac1SP_valueChanged(double sp);
 };
 
 #endif // MFCUI_H

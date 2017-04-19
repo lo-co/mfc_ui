@@ -22,7 +22,7 @@
  */
 
 DEFINE_ENUM_WITH_STRING_CONVERSIONS(gas, (Air)(Ar)(CH4) \
-                                    (CO)(CO2)\
+                                    (CO)(CO2) \
                                     (C2H6)(H2)(He)(N2)\
                                     (N2O)(Ne)(O2)(C3H8)(nC4H10)(C2H2));
 
@@ -123,15 +123,11 @@ private:
      * from the port that it is communicating on.  If the read is
      * unsuccessful, it will return an empty string.
      */
-    alicat_data parse_data(const std::string &msg);
+    alicat_data* parse_data(const std::string &msg);
 
     std::shared_ptr<SerialComm> port; /** IOC for the serial port... */
 
     float max_flow;
-
-
-
-
 
 };
 

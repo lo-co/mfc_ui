@@ -40,9 +40,18 @@ void SerialComm::writeString(const string &s){
 std::string SerialComm::async_rw(string w_str, bool multiline){
 
     writeString(w_str);
+    string p_string = "";
     string r_string =readStrUntil();
 
-    if (multiline) {while (r_string != (r_string += readStrUntil())){}}
+    if (multiline) {
+        while (r_string != p_string){
+            p_string = r_string;
+
+            std::string temp_str = readStrUntil();
+            if (temp_str != "") r_string += "\r" + temp_str;
+        }
+    }
+    cout << r_string <<endl;
 
     return r_string;
 }
